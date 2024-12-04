@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق الآلة الحاسبة وراديو البهجة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #007BFF;
+        }
+        .result {
+            margin: 10px auto;
+            font-size: 20px;
+            font-weight: bold;
+            color: #555;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            width: 90%;
+            text-align: right;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px auto;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button.operation {
+            background-color: #28a745;
+        }
+        button.operation:hover {
+            background-color: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+    <!-- قسم الراديو -->
+    <div class="container">
+        <h1>راديو البهجة</h1>
+        <p>اضغط على الزر للاستماع إلى البث المباشر</p>
+        <button id="playButton">تشغيل</button>
+        <audio id="radio" src="https://my.radioalgerie.dz/ar/bahdja" type="audio/mpeg"></audio>
+        <div class="result" id="status">الراديو متوقف</div>
+    </div>
+
+    <!-- قسم الآلة الحاسبة -->
+    <div class="container">
+        <h1>الآلة الحاسبة</h1>
+        <div class="result" id="calcDisplay">0</div>
+        <div class="buttons">
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="operation" onclick="setOperation('/')">÷</button>
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="operation" onclick="setOperation('*')">×</button>
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button class="operation" onclick="setOperation('-')">−</button>
+            <button onclick="appendNumber('0')">0</button>
+            <button onclick="clearCalc()">C</button>
+            <button onclick="calculate()">=</button>
+            <button class="operation" onclick="setOperation('+')">+</button>
+        </div>
+    </div>
+
+    <script>
+        // تشغيل وإيقاف الراديو
+        const playButton = document.getElementById("playButton");
+        const radio = document.getElementById("radio");
+        const status = document.getElementById("status");
+
+        let isPlaying = false;
+
+        playButton.addEventListener("click", () => {
+            if (isPlaying) {
+                radio.pause();
+                playButton.textContent = "تشغيل";
+                status.textContent = "الراديو متوقف";
+            } else {
+                radio.play();
+                playButton.textContent = "إيقاف";
+                status.textContent = "الراديو قيد التشغيل";
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // العمليات الحسابية
+        let currentNumber = '';
+        let previousNumber = '';
+        let operation = null;
+
+        function appendNumber(number) {
+            if (currentNumber.includes('.') && number === '.') return;
+            currentNumber += number;
+            updateDisplay(currentNumber);
+        }
+
+        function setOperation(op) {
+            if (currentNumber === '') return;
+            if (previousNumber !== '') calculate();
+            operation = op;
+            previousNumber = currentNumber;
+            currentNumber = '';
+        }
+
+        function calculate() {
+            let result;
+            const prev = parseFloat(previousNumber);
+            const curr = parseFloat(currentNumber);
+            if (isNaN(prev) || isNaN(curr)) return;
+            switch (operation) {
+                case '+':
+                    result = prev + curr;
+                    break;
+                case '-':
+                    result = prev - curr;
+                    break;
+                case '*':
+                    result = prev * curr;
+                    break;
+                case '/':
+                    result = prev / curr;
+                    break;
+                default:
+                    return;
+            }
+            currentNumber = result.toFixed(2).replace('.', ',');
+            operation = null;
+            previousNumber = '';
+            updateDisplay(currentNumber);
+        }
+
+        function clearCalc() {
+            currentNumber = '';
+            previousNumber = '';
+            operation = null;
+            updateDisplay(0);
+        }
+
+        function updateDisplay(value) {
+            document.getElementById("calcDisplay").textContent = value;
+        }
+    </script>
+</body>
+</html>
